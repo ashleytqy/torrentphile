@@ -28,3 +28,6 @@ p2p upload [filename]
 ```
 p2p download [file url]
 ```
+
+# references
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.114.4974&rep=rep1&type=pdf
