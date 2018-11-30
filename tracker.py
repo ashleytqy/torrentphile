@@ -19,7 +19,7 @@ class Tracker:
 
     while True:
       data, address = self.sock.recvfrom(1024)
-      data = rpc_data.decode("utf-8")
+      data = data.decode("utf-8")
       print("argument is " + data)
       self.sock.sendto(str.encode('hihihi'), address)
 
