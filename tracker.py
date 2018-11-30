@@ -11,14 +11,12 @@ class Tracker:
     self.sock = None
 
     self.listen()
-    self.respond()
 
   # continually listen on a port for any incoming client requests to connect 
   def listen(self):
     self.sock = socket(AF_INET, SOCK_DGRAM)
     self.sock.bind((self.address, self.port_number))
 
-  def respond(self):
     while True:
       data, address = self.sock.recvfrom(1024)
       data = rpc_data.decode("utf-8")
