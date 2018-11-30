@@ -3,6 +3,14 @@ class Client:
     self.port_number = port_number
     self.folder = '/tmp/' + port_number
 
+    # list of peers it is connected to
+    # peers need to know what pieces of the content each peer in its peer set has
+    self.peer_set = []
+
+    # leecher state: it is still downloading the file while uploading pieces it has to other leechers
+    # seed state: it has the complete file and is uploading to leechers
+    self.state = None
+
   def upload(self, file_location):
     pass
 
