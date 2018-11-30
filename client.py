@@ -11,7 +11,14 @@ class Client:
     # seed state: it has the complete file and is uploading to leechers
     self.state = None
 
+  def connect(self, peer):
+    # first establish the connection
+    self.peer_set.append(peer)
+
   def upload(self, file_location):
+    # split file into equal parts
+    # get all active peers
+    # distribute file parts to specific peers
     pass
 
   def download(self, file_id):
@@ -22,5 +29,7 @@ class Client:
     # reorder parts
     pass
 
-  def reorder_parts():
+  def reorder_parts(parts):
+    # sort parts of files by some index
+    # combine parts
     pass
