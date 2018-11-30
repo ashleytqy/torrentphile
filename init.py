@@ -12,7 +12,7 @@ def run():
   if args.type == 'client':
     client = Client(args.port)
   else:
-    tracker = Tracker(args.port)
+    tracker = Tracker()
 
 
 if __name__== "__main__":
