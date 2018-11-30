@@ -3,9 +3,14 @@ class Tracker:
     self.port_number = port_number
     self.active_clients = []
 
-  def register(client_id):
+  # continually listen on a port for any incoming client requests to connect 
+  def listen(self):
+    pass
+  
+  # register incoming clients
+  def register(self, client_id):
     self.active_clients.append(client_id)
 
-  def get_clients_for_file(file):
+  def get_clients_for_file(self, file):
     pass
 

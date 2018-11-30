@@ -3,10 +3,15 @@ class Client:
     self.port_number = port_number
     self.folder = '/tmp/' + port_number
 
-  def upload(file_location):
+  def upload(self, file_location):
     pass
 
-  def download(file_id):
+  def download(self, file_id):
+    # first, talk to tracker and get the info
+    # about which peers to get the file from
+
+    # then connect to those peers and download all parts
+    # reorder parts
     pass
 
   def reorder_parts():
