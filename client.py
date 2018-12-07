@@ -19,7 +19,7 @@ class Client:
     self.peer_set.append(peer)
 
   def upload(self, file_location):
-    self.file_splitter.split(file_location)
+    files = self.file_splitter.split(file_location)
     # split file into equal parts
     # get all active peers
     # distribute file parts to specific peers
