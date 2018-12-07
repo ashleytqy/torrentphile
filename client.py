@@ -1,7 +1,10 @@
+from file_splitter import *
+
 class Client:
   def __init__(self, port_number):
     self.port_number = port_number
     self.folder = '/tmp/' + port_number
+    self.file_splitter = FileSplitter()
 
     # list of peers it is connected to
     # peers need to know what pieces of the content each peer in its peer set has
@@ -16,10 +19,11 @@ class Client:
     self.peer_set.append(peer)
 
   def upload(self, file_location):
+    self.file_splitter.split(file_location)
     # split file into equal parts
     # get all active peers
     # distribute file parts to specific peers
-    pass
+    
 
   def download(self, file_id):
     # first, talk to tracker and get the info

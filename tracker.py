@@ -21,7 +21,7 @@ class Tracker:
       data, address = self.sock.recvfrom(1024)
       data = data.decode("utf-8")
       print("argument is " + data)
-      self.sock.sendto(str.encode('hihihi'), address)
+      self.sock.sendto(str.encode('ack.'), address)
 
   # register incoming clients
   def register(self, client_id):

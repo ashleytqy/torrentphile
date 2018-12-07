@@ -11,6 +11,7 @@ def run():
 
   if args.type == 'client':
     client = Client(args.port)
+    client.upload('/tmp/test.txt')
   else:
     tracker = Tracker()
 
