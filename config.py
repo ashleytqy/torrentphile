@@ -1,0 +1,9 @@
+SOCK_CONFIG = {
+  'REGISTER_PORT': 8000,
+  'ADDRESS': '127.0.0.1',
+  'DATA_SIZE': 1024,
+}
+
+MESSAGES = {
+  'REGISTER_ACK': 'ack',
+}

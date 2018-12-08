@@ -1,12 +1,19 @@
 import sys
-from socket import *
+import socket as s
 
 from file_splitter import *
+from config import SOCK_CONFIG, MESSAGES
+from logger import Logger
 
 class Client:
-  def __init__(self, port_number):
+  def __init__(self, port_number, enable_logging=False):
+    
     self.port_number = port_number
-    self.folder = '/tmp/' + port_number
+    self.id = str(port_number)
+    self.log = Logger('Client ' + self.id, enable_logging).log
+    self.registered = False
+    # so we don't alter system files. only compatible for MacOS
+    self.folder = '/~/tmp/' + str(port_number)
     self.file_splitter = FileSplitter()
 
     # shoud we have only 1 socket for this client, or 1 socket per peer?
@@ -21,26 +28,33 @@ class Client:
 
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
-    self.notify_tracker()
+    self.register()
+    
 
-  def notify_tracker(self, port = 8000):
-    tracker_address = ("127.0.0.1", 8000)
-    sock = socket(AF_INET, SOCK_STREAM)
+  def register(self):
+    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
-    message = 'hello from client!'
-    sock.send(message.encode("utf-8"))
-    print("sent: " + message + "\n")
-    # if recieved an ack, return True, else False / throw an error?
-    # leave it to init.py to catch the error
-    # sock.close()
+    message = 'registering ' + self.id
+    sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+
+    if response == MESSAGES['REGISTER_ACK']:
+      self.log('succesfully registered')
+      self.registered = True
+      sock.close()
+    else:
+      self.log('unsuccessfully registered')
+      sock.close()
+      raise RuntimeError
 
   def connect(self, peer):
     # first establish the connection
     # peer ==> port
     peer_address = ("127.0.0.1", peer)
-    sock = socket(AF_INET, SOCK_STREAM)
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(peer_address)
-    message = 'hello from client!'
+    message = 'registering ' + self.id
     sock.send(message.encode("utf-8"))
     print("sent: " + message + "\n")
 
@@ -61,7 +75,7 @@ class Client:
     # reorder parts
     pass
 
-  def reorder_parts(parts):
+  def reorder_parts(self, parts):
     # sort parts of files by some index
     # combine parts
     pass
