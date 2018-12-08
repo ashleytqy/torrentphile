@@ -2,6 +2,8 @@ import sys
 import os
 from socket import *
 
+DATA_SIZE = 1024
+
 class Tracker:
   def __init__(self, port_number = 8000):
     self.debug = True
@@ -14,12 +16,14 @@ class Tracker:
 
   # continually listen on a port for any incoming client requests to connect 
   def listen(self):
-    self.sock = socket(AF_INET, SOCK_DGRAM)
+    self.sock = socket(AF_INET, SOCK_STREAM)
     self.sock.bind((self.address, self.port_number))
+    self.sock.listen(0)
+    print('hlo')
 
     while True:
-      data, address = self.sock.recvfrom(1024)
-      data = data.decode("utf-8")
+      sender_socket, sender_addr = self.sock.accept()
+      data, address = sender_socket.recv(DATA_SIZE).decode("utf-8")
       print("argument is " + data)
       self.sock.sendto(str.encode('ack.'), address)
 

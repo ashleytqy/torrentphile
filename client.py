@@ -1,3 +1,6 @@
+import sys
+from socket import *
+
 from file_splitter import *
 
 class Client:
@@ -13,6 +16,20 @@ class Client:
     # leecher state: it is still downloading the file while uploading pieces it has to other leechers
     # seed state: it has the complete file and is uploading to leechers
     self.state = None
+
+    # when we initialise a client, we automatically inform the tracker
+    # i.e. we initialise a connection to the tracker server
+    self.notify_tracker()
+
+  def notify_tracker(self, port = 8000):
+    tracker_address = ("127.0.0.1", 8000)
+    print(tracker_address)
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.connect(tracker_address)
+    message = 'hello from client!'
+    sock.send(message.encode("utf-8"))
+    print("sent: " + message + "\n")
+    # sock.close()
 
   def connect(self, peer):
     # first establish the connection
