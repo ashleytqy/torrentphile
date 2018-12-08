@@ -1,6 +1,10 @@
 # torrentphile
 bittorrent clone and a wordplay on file and phile. 
 
+# contributors
+@ashleytqy
+@tommyguo
+
 # what
 A P2P file transfer application similar to BitTorrent – where a user can upload any file, which will be distributed across the other users online in the system. When a user wants to retrieve a specific file, they will get the various pieces of the file from the other online users.
 
