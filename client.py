@@ -63,6 +63,7 @@ class Client:
 
   def upload(self, file_location):
     files = self.file_splitter.split(file_location)
+    print(files)
     # split file into equal parts
     # get all active peers
     # distribute file parts to specific peers

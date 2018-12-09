@@ -28,6 +28,7 @@ class Tracker:
       thread = Thread(target=self.process_registration)
       thread.start()
       thread.join()
+      self.log('clients', self.clients)
 
   def process_registration(self):
     conn = self.sock.accept()[0]
