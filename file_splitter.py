@@ -1,12 +1,12 @@
 # coding: utf-8
 import os
-
+from config import SOCK_CONFIG
 # clean up: https://superuser.com/questions/482435/how-to-remove-all-files-starting-with-a-certain-string-in-linux/482436
 # from https://www.tutorialspoint.com/How-to-spilt-a-binary-file-into-multiple-files-using-Python
 
 class FileSplitter:
-  def __init__(self, chunk_size = 500):
-    self.chunk_size = chunk_size
+  def __init__(self):
+    self.chunk_size = SOCK_CONFIG['DATA_SIZE']
 
   def split(self, file_path):
     chunk_file_names = []

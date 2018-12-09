@@ -48,25 +48,32 @@ class Client:
       sock.close()
       raise RuntimeError
 
-  def connect(self, peer):
-    # first establish the connection
-    # peer ==> port
-    peer_address = ("127.0.0.1", peer)
+  def get_active_peers(self):
+    # get active peers by asking the tracker
+    return []
+
+  def send_to_peer(self, peer_port, file):
+    peer_address = (SOCK_CONFIG['ADDRESS'], peer_port)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(peer_address)
-    message = 'registering ' + self.id
-    sock.send(message.encode("utf-8"))
-    print("sent: " + message + "\n")
+    sock.send(file.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
-    # if connection is successful, add peer to peer set
-    self.peer_set.append(peer)
+    if response == MESSAGES['REGISTER_ACK']:
+      self.log('succesfully sent file chunk')
+      sock.close()
+    else:
+      self.log('unsuccessfully sent file chunk')
+      sock.close()
+      raise RuntimeError
 
   def upload(self, file_location):
-    files = self.file_splitter.split(file_location)
-    print(files)
-    # split file into equal parts
-    # get all active peers
-    # distribute file parts to specific peers
+    files_parts = self.file_splitter.split(file_location)
+    self.log('Files are split into ' + ', '.join(files_parts))
+
+    for i, file in enumerate(files_parts):
+      peer = self.peer_set[i] % len(self.get_active_peers())
+      self.send_to_peer(self, peer, file)
 
   def download(self, file_id):
     # first, talk to tracker and get the info
