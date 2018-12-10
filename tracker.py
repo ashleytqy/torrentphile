@@ -40,6 +40,11 @@ class Tracker:
     client_id = response[1]
     message = ''
 
+    # assumptions: responses are in the form
+    # ACTION
+    # CLIENT ID
+    # FILE HASH // FILE UUID (a files uuid is its hash)
+
     if action == MESSAGES['REGISTER_CLIENT']:
       self.clients.append(client_id)
       self.log('registered', client_id)
@@ -48,11 +53,13 @@ class Tracker:
     elif action == MESSAGES['UPLOAD_FILE']:
       file_uuid = response[2]
       self.file_to_client[file_uuid] = [client_id]
-      self.log(self.file_to_client)
       message = MESSAGES['UPLOAD_ACK']
 
     elif action == MESSAGES['DOWNLOAD_FILE']:
-      pass
+      file_uuid = response[2]
+      message = MESSAGES['DOWNLOAD_ACK']
+      for node in self.file_to_client[file_uuid]:
+        message.append("\n" + node)
 
     conn.send(message.encode('utf-8'))
     conn.close()
