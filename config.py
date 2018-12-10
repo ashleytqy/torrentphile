@@ -6,4 +6,9 @@ SOCK_CONFIG = {
 
 MESSAGES = {
   'REGISTER_ACK': 'ack',
+  'REGISTER_CLIENT': 'register_client',
+  'UPLOAD_FILE': 'upload_file',
+  'UPLOAD_ACK': 'upload_ACK',
+  'DOWNLOAD_FILE': 'download_file',
+  'DOWNLOAD_ACK': 'download_ACK'
 }

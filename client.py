@@ -4,6 +4,7 @@ import socket as s
 from file_splitter import *
 from config import SOCK_CONFIG, MESSAGES
 from logger import Logger
+import hashlib
 
 class Client:
   def __init__(self, port_number, enable_logging=False):
@@ -35,7 +36,7 @@ class Client:
     tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
-    message = 'registering ' + self.id
+    message = MESSAGES['REGISTER_CLIENT'] + '\n' + self.id
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
@@ -68,12 +69,25 @@ class Client:
       raise RuntimeError
 
   def upload(self, file_location):
-    files_parts = self.file_splitter.split(file_location)
-    self.log('Files are split into ' + ', '.join(files_parts))
+    file = open(file_location,'rb').read()
+    file_digest = hashlib.md5(file).hexdigest()
 
-    for i, file in enumerate(files_parts):
-      peer = self.peer_set[i] % len(self.get_active_peers())
-      self.send_to_peer(self, peer, file)
+    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
+
+    message = MESSAGES['UPLOAD_FILE'] + '\n' + self.id + '\n' + file_digest
+    self.log(message)
+    sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+
+    if response == MESSAGES['UPLOAD_ACK']:
+      self.log('succesfully notified tracker')
+      sock.close()
+    else:
+      self.log('unsuccessfully notified tracker')
+      sock.close()
+      raise RuntimeError
 
   def download(self, file_id):
     # first, talk to tracker and get the info

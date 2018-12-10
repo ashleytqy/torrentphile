@@ -14,6 +14,7 @@ class Tracker:
     self.address = SOCK_CONFIG['ADDRESS']
     self.clients = []
     self.sock = None
+    self.file_to_client = {}
 
     self.process_registrations()
 
@@ -32,13 +33,25 @@ class Tracker:
 
   def process_registration(self):
     conn = self.sock.accept()[0]
-    response = conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
-    client_id = response.split(' ')[1]
-    self.clients.append(client_id)
-    self.log('registered', client_id)
-    conn.send(MESSAGES['REGISTER_ACK'].encode('utf-8'))
+    response = conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
+    
+    action = response[0]
+    client_id = response[1]
+    message = ''
+
+    if action == MESSAGES['REGISTER_CLIENT']:
+      self.clients.append(client_id)
+      self.log('registered', client_id)
+      message = MESSAGES['REGISTER_ACK']
+
+    elif action == MESSAGES['UPLOAD_FILE']:
+      file_uuid = response[2]
+      self.file_to_client[file_uuid] = [client_id]
+      self.log(self.file_to_client)
+      message = MESSAGES['UPLOAD_ACK']
+
+    elif action == MESSAGES['DOWNLOAD_FILE']:
+      pass
+
+    conn.send(message.encode('utf-8'))
     conn.close()
-
-  def get_clients_for_file(self, file):
-    pass
-
