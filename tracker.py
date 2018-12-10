@@ -14,6 +14,7 @@ class Tracker:
     self.address = SOCK_CONFIG['ADDRESS']
     self.clients = []
     self.sock = None
+    # mapping the hex digest of a file to the clients that current have it
     self.file_to_client = {}
 
     self.process_registrations()
