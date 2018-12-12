@@ -21,9 +21,15 @@ def run_client_simulation():
 
   # simulate an upload
   random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
-  client = clients[random_id]
+  uploader = clients[random_id]
   file_location = '/tmp/test.txt'
-  client.upload(file_location)
+  uploader.upload(file_location)
+
+  random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
+  downloader = clients[random_id]
+  print(downloader)
+  downloader.download('f0f0f8e489652435c38caa6e53b7b749')
+
 
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)

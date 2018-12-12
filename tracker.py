@@ -58,8 +58,9 @@ class Tracker:
     elif action == MESSAGES['DOWNLOAD_FILE']:
       file_uuid = response[2]
       message = MESSAGES['DOWNLOAD_ACK']
-      for node in self.file_to_client[file_uuid]:
-        message.append("\n" + node)
+
+      for node_id in self.file_to_client[file_uuid]:
+        message += ("\n" + node_id)
 
     conn.send(message.encode('utf-8'))
     conn.close()
