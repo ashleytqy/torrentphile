@@ -44,12 +44,6 @@ def run_download_simulation(client_id, file_name='test.txt'):
   downloader = clients[client_id]
   downloader.download(file_name)
 
-def exit_handler():
-  for key in clients:
-    clients[key].disconnect()
-
-atexit.register(exit_handler)
-
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)
   tracker_thread.start()
@@ -62,4 +56,3 @@ if __name__== "__main__":
   time.sleep(5)
   kill_tracker_thread = Thread(target=Tracker.kill_self())
   kill_tracker_thread.start()
-  exit_handler()

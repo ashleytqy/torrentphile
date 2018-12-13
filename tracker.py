@@ -110,7 +110,7 @@ class Tracker:
 
     # since the uploader has all the file parts
     for i in range(chunk_count):
-      self.file_to_client[file_name][i] = [client_id]
+      self.file_to_client[file_name][i + 1] = [client_id]
 
     self.log(self.file_to_client)
     message = MESSAGES['UPLOAD_ACK']

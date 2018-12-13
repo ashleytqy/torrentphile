@@ -115,6 +115,7 @@ class Client:
     sock.connect(tracker_address)
     message = MESSAGES['DISCONNECT']
     sock.send(message.encode('utf-8'))
+    sock.close()
 
 
   # call this method after client has successfully downloaded all chunks
