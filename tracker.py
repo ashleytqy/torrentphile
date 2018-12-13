@@ -16,6 +16,7 @@ class Tracker:
     self.sock = None
     # mapping the hex digest of a file to the clients that current have it
     self.file_to_client = {}
+    self.registered_client = None
 
     self.connect_clients()
 
@@ -26,9 +27,12 @@ class Tracker:
     self.registration_sock.listen(0)
 
     while True:
-      thread = Thread(target=self.connect_client)
-      thread.start()
-      thread.join()
+      registration_thread = Thread(target=self.connect_client)
+      registration_thread.start()
+      registration_thread.join()
+
+      listen_thread = Thread(target=self.listen, args=[self.registered_client])
+      listen_thread.start()
 
   def connect_client(self):
     registration_conn = self.registration_sock.accept()[0]
@@ -37,6 +41,7 @@ class Tracker:
 
     if command != MESSAGES['REGISTER_CLIENT']:
       registration_conn.close()
+      return None
     else:
       # client_id is also the client's port number
       # in a real application, the client_id would be its address, but since we're running
@@ -51,17 +56,24 @@ class Tracker:
       self.log('registered', client_id)
       registration_conn.send(MESSAGES['REGISTER_ACK'].encode('utf-8'))
       registration_conn.close()
-      
+
+      self.registered_client = client_id
+    
+  def listen(self, client_id):
+      self.log('listening to', client_id)
       client_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+      client_config = self.clients[client_id]
       client_config['sock'] = client_sock
 
       client_sock.bind((client_config['address'], client_config['port']))
       client_sock.listen(0)
       client_conn = client_sock.accept()[0]
 
-      while True:
+      while True:  
         response = client_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
         command = response.split(' ')[0]
+
+        self.log('received response from ' + client_id + ':',response,)
 
         if command == MESSAGES['UPLOAD_FILE']:
           self.process_upload(client_id, client_conn, response)
@@ -73,18 +85,20 @@ class Tracker:
           client_conn.close()
           break
 
-  def process_upload(self, client_id, client_conn, response):3
-    self.file_to_client[file_uuid] = [client_id]
-    message = MESSAGES['UPLOAD_ACK']
+  def process_upload(self, client_id, client_conn, response):
+    # self.file_to_client[file_uuid] = [client_id]
+    # message = MESSAGES['UPLOAD_ACK']
 
-    client_conn.send(message.encode('utf-8'))
+    # client_conn.send(message.encode('utf-8'))
+    pass
 
-  def process_download(self, client_conn, arguments):
-    file_uuid = arguments
-    message = MESSAGES['DOWNLOAD_ACK']
-    for node in self.file_to_client[file_uuid]:
-      message.append("\n" + node)
+  def process_download(self, client_id, client_conn, response):
+    # file_uuid = arguments
+    # message = MESSAGES['DOWNLOAD_ACK']
+    # for node in self.file_to_client[file_uuid]:
+    #   message.append("\n" + node)
 
-    client_conn.send(message.encode('utf-8'))
+    # client_conn.send(message.encode('utf-8'))
+    pass
 
   

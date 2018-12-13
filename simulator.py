@@ -20,15 +20,15 @@ def run_client_simulation():
     clients[id] = client
 
   # simulate an upload
-  random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
-  uploader = clients[random_id]
-  file_location = '/tmp/test.txt'
-  uploader.upload(file_location)
+  # random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
+  # uploader = clients[random_id]
+  # file_location = '/tmp/test.txt'
+  # uploader.upload(file_location)
 
-  random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
-  downloader = clients[random_id]
-  print(downloader)
-  downloader.download('f0f0f8e489652435c38caa6e53b7b749')
+  # random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
+  # downloader = clients[random_id]
+  # print(downloader)
+  # downloader.download('f0f0f8e489652435c38caa6e53b7b749')
 
 
 if __name__== "__main__":

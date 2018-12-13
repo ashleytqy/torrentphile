@@ -33,10 +33,10 @@ class Client:
     
 
   def register(self):
-    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], SOCK_CONFIG['REGISTRATION_PORT'])
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
-    message = MESSAGES['REGISTER_CLIENT'] + '\n' + self.id
+    message = MESSAGES['REGISTER_CLIENT'] + ' ' + self.id
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
@@ -45,7 +45,7 @@ class Client:
       self.registered = True
       sock.close()
     else:
-      self.log('unsuccessfully registered')
+      self.log('unsuccessfully registered with response', response)
       sock.close()
       raise RuntimeError
 
@@ -76,7 +76,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['UPLOAD_FILE'] + '\n' + self.id + '\n' + file_digest
+    message = MESSAGES['UPLOAD_FILE'] + ' ' + self.id + ' ' + file_digest
     self.log(message)
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
@@ -99,7 +99,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['DOWNLOAD_FILE'] + '\n' + self.id + '\n' + file_id
+    message = MESSAGES['DOWNLOAD_FILE'] + ' ' + self.id + ' ' + file_id
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
 
