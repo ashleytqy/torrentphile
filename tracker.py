@@ -111,7 +111,6 @@ class Tracker:
     for i in range(chunk_count):
       self.file_to_client[file_name][i + 1] = [client_id]
 
-    self.log(self.file_to_client)
     message = MESSAGES['UPLOAD_ACK']
     client_conn.send(message.encode('utf-8'))
 
