@@ -96,10 +96,11 @@ class Tracker:
           break
 
   def process_upload(self, client_id, client_conn, response):
-    # self.file_to_client[file_uuid] = [client_id]
-    self.log(MESSAGES['UPLOAD_ACK'], response)
+    client_id = response[0]
+    file_name = response[1]
+
+    self.file_to_client[file_name] = [client_id]
     message = MESSAGES['UPLOAD_ACK']
-    self.log(client_conn)
     
     # this part is causing the infinte loop
     # client_conn.send(message.encode('utf-8'))
