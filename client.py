@@ -30,10 +30,10 @@ class Client:
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
     self.register()
-    
 
   def register(self):
-    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], SOCK_CONFIG['REGISTRATION_PORT'])
+
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
     message = MESSAGES['REGISTER_CLIENT'] + '\n' + self.id

@@ -11,6 +11,6 @@ MESSAGES = {
   'UPLOAD_FILE': 'upload_file',
   'UPLOAD_ACK': 'upload_ack',
   'DOWNLOAD_FILE': 'download_file',
-  'DOWNLOAD_ACK': 'download_ACK',
+  'DOWNLOAD_ACK': 'download_ack',
   'DISCONNECT': 'disconnect',
 }
