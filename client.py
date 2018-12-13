@@ -46,13 +46,14 @@ class Client:
     full_path = self.directory + '/' + file_location
     file_name, file_ext = os.path.splitext(file_location)
     file_chunks = self.file_splitter.split(self.directory, 'test.txt')
+    how_many_chunks = len(file_chunks)
 
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_location])
-    # sock.send(message.encode('utf-8'))
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_location, how_many_chunks])
+    sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
 
     if response == MESSAGES['UPLOAD_ACK']:
@@ -136,4 +137,5 @@ class Client:
 
   def construct_message(self, op, messages = []):
     # messages is an array
-    return (' ').join([op, self.id] + messages)
+    messages = [str(m) for m in messages]
+    return (' ').join([op, str(self.id)] + messages)

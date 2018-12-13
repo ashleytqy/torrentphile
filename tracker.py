@@ -14,7 +14,7 @@ class Tracker:
     self.address = SOCK_CONFIG['TRACKER_ADDRESS']
     self.clients = {}
     self.sock = None
-    # mapping the hex digest of a file to the clients that current have it
+    # mapping the filename and part to the clients that current have it
     self.file_to_client = {}
     self.registered_client = None
     self.kill = False
@@ -83,7 +83,12 @@ class Tracker:
         response = client_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
         command = response.split(' ')[0]
 
-        self.log('received response from ' + client_id + ':',response,)
+        self.log('received response from ' + client_id + ':', response)
+
+        if not response:
+          self.log("error. this should not happen.")
+          break
+
 
         if command == MESSAGES['UPLOAD_FILE']:
           self.process_upload(client_id, client_conn, response)
@@ -96,13 +101,20 @@ class Tracker:
           break
 
   def process_upload(self, client_id, client_conn, response):
-    client_id = response[0]
-    file_name = response[1]
+    self.log(response)
+    client_id = response.split(' ')[1]
+    file_name = response.split(' ')[2]
+    chunk_count = int(response.split(' ')[3])
 
-    self.file_to_client[file_name] = [client_id]
+    self.file_to_client[file_name] = {}
+
+    # since the uploader has all the file parts
+    for i in range(chunk_count):
+      self.file_to_client[file_name][i] = [client_id]
+
+    self.log(self.file_to_client)
     message = MESSAGES['UPLOAD_ACK']
     
-    # this part is causing the infinte loop
     # client_conn.send(message.encode('utf-8'))
 
   def process_download(self, client_id, client_conn, response):

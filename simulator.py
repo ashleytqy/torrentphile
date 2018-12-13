@@ -62,3 +62,4 @@ if __name__== "__main__":
   time.sleep(5)
   kill_tracker_thread = Thread(target=Tracker.kill_self())
   kill_tracker_thread.start()
+  exit_handler()
