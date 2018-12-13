@@ -100,7 +100,6 @@ class Tracker:
           break
 
   def process_upload(self, client_id, client_conn, response):
-    self.log(response)
     client_id = response.split(' ')[1]
     file_name = response.split(' ')[2]
     chunk_count = int(response.split(' ')[3])
@@ -115,13 +114,17 @@ class Tracker:
     client_conn.send(message.encode('utf-8'))
 
   def process_download(self, client_id, client_conn, response):
-    # file_uuid = arguments
-    # message = MESSAGES['DOWNLOAD_ACK']
-    # for node in self.file_to_client[file_uuid]:
-    #   message.append("\n" + node)
+    file_name = response[2]
 
-    # client_conn.send(message.encode('utf-8'))
-    pass
+    if file_name not in self.file_to_client.keys():
+      message = MESSAGES['NONEXISTENT_FILE']
+    else:
+      message = MESSAGES['DOWNLOAD_ACK']
+
+      # for table in self.file_to_client[file_uuid]:
+      #   message.append(" " + node)
+
+    client_conn.send(message.encode('utf-8'))
 
   def process_disconnect(self, client_id, client_conn, response):
     client_conn.close()

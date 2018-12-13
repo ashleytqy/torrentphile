@@ -29,9 +29,11 @@ def run_client_simulation(client_id):
 
   if client_id == 10000:
     run_upload_simulation(client_id, 'test.txt')
+    # run_upload_simulation(client_id, 'two.txt') 
 
   if client_id == 10002:
     run_upload_simulation(client_id, 'fun.txt') 
+    # run_upload_simulation(client_id, 'another.txt') 
 
   if client_id == 10001:
     run_download_simulation(client_id, 'fun.txt')

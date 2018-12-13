@@ -12,6 +12,7 @@ MESSAGES = {
   'UPLOAD_ACK': 'upload_ack',
   'DOWNLOAD_FILE': 'download_file',
   'DOWNLOAD_ACK': 'download_ack',
+  'NONEXISTENT_FILE': 'nonexistent_file',
   'DISCONNECT': 'disconnect',
-  'KILL_TRACKER': 'kill_tracker',
+  'KILL_TRACKER': 'kill_tracker'
 }

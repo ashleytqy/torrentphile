@@ -89,6 +89,10 @@ class Client:
       sock.close()
       return active_peers
     
+    elif response[0] == MESSAGES['NONEXISTENT_FILE']:
+      self.log('file does not exist')
+      sock.close()
+      return []
     else:
       self.log('unable to obtain active peers from tracker')
       sock.close()
