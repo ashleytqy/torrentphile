@@ -46,18 +46,14 @@ class Client:
     full_path = self.directory + '/' + file_location
     file_name, file_ext = os.path.splitext(file_location)
     file_chunks = self.file_splitter.split(self.directory, 'test.txt')
-    self.log(file_chunks)
-
-    x = self.reorder_and_combine_chunks(full_path, 'hi' + file_ext)
-    self.log(x)
 
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    sock.connect(tracker_address)
+    # sock.connect(tracker_address)
 
-    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_digest])
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_location])
     # sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+    # response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
 
     if response == MESSAGES['UPLOAD_ACK']:
       self.log('succesfully notified tracker')
@@ -119,6 +115,10 @@ class Client:
     message = MESSAGES['DISCONNECT']
     sock.send(message.encode('utf-8'))
 
+
+  # call this method after client has successfully downloaded all chunks
+  # and stored all the chunks in its folder
+  # pass in the name of the file you want to save it in
   def reorder_and_combine_chunks(self, file_name, new_file_path):
     # get all files in the right directory
     # after a client downloads, all the chunks will live in /tmp/:port/:name/1..100
