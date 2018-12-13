@@ -36,7 +36,7 @@ class Client:
 
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
-    message = MESSAGES['REGISTER_CLIENT'] + '\n' + self.id
+    message = self.construct_message(MESSAGES['REGISTER_CLIENT'])
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
@@ -76,7 +76,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['UPLOAD_FILE'] + '\n' + self.id + '\n' + file_digest
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_digest])
     self.log(message)
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
@@ -99,7 +99,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['DOWNLOAD_FILE'] + '\n' + self.id + '\n' + file_id
+    message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_id])
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
 
@@ -118,3 +118,7 @@ class Client:
     # sort parts of files by some index
     # combine parts
     pass
+
+  def construct_message(self, op, messages = []):
+    # messages is an array
+    return ('\n').join([op, self.id] + messages)

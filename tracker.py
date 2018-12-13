@@ -49,8 +49,8 @@ class Tracker:
 
       self.clients[client_id] = client_config
       self.log('registered', client_id)
-      message = MESSAGES['REGISTER_ACK']
-      registration_conn.send(message.encode('utf-8'))
+
+      registration_conn.send(MESSAGES['REGISTER_ACK'].encode('utf-8'))
       registration_conn.close()
       
       client_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
