@@ -90,12 +90,29 @@ class Client:
       raise RuntimeError
 
   def download(self, file_id):
-    # first, talk to tracker and get the info
-    # about which peers to get the file from
-
-    # then connect to those peers and download all parts
+    peers = self.get_active_peers(file_id)
+    # connect to those peers and download all parts
     # reorder parts
-    pass
+
+  def get_active_peers(self, file_id):
+    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
+
+    message = MESSAGES['DOWNLOAD_FILE'] + '\n' + self.id + '\n' + file_id
+    sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
+
+    if response[0] == MESSAGES['DOWNLOAD_ACK']:
+      active_peers = response[1]
+      self.log('successfully obtained active peers from tracker:', active_peers)
+      sock.close()
+      return active_peers
+    
+    else:
+      self.log('unable to obtain active peers from tracker')
+      sock.close()
+      raise RuntimeError
 
   def reorder_parts(self, parts):
     # sort parts of files by some index
