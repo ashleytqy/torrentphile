@@ -1,5 +1,6 @@
 import sys
 import socket as s
+import time
 
 from file_splitter import *
 from config import SOCK_CONFIG, MESSAGES
@@ -123,8 +124,8 @@ class Client:
 
   # call this method after client has successfully downloaded all chunks
   # and stored all the chunks in its folder
-  # pass in the name of the file you want to save it in
-  def reorder_and_combine_chunks(self, file_name, new_file_path):
+  # the saved file path would be the file_name_[epoch time]
+  def reorder_and_combine_chunks(self, file_name):
     # get all files in the right directory
     # after a client downloads, all the chunks will live in /tmp/:port/:name/1..100
     # path = self.directory + '/' + file_name
@@ -132,6 +133,7 @@ class Client:
     self.log('path is', path)
     file_parts = [f for f in listdir(path) if isfile(join(path, f))]
 
+    new_file_path = file_name + '_' + str(int(time.time()))
     with open(self.directory + '/' + new_file_path, 'w' ) as result:
       for f in file_parts:
           for line in open(path + '/' + f, 'r' ):
