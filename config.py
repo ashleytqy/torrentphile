@@ -1,6 +1,7 @@
 SOCK_CONFIG = {
-  'REGISTER_PORT': 8000,
-  'ADDRESS': '127.0.0.1',
+  'REGISTRATION_PORT': 8000,
+  'TRACKER_ADDRESS': '127.0.0.1',
+  'CLIENT_ADDRESS': '127.0.0.1',
   'DATA_SIZE': 1024,
 }
 
@@ -10,5 +11,6 @@ MESSAGES = {
   'UPLOAD_FILE': 'upload_file',
   'UPLOAD_ACK': 'upload_ACK',
   'DOWNLOAD_FILE': 'download_file',
-  'DOWNLOAD_ACK': 'download_ACK'
+  'DOWNLOAD_ACK': 'download_ACK',
+  'DISCONNECT': 'disconnect',
 }
