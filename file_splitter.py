@@ -8,17 +8,20 @@ class FileSplitter:
   def __init__(self):
     self.chunk_size = SOCK_CONFIG['DATA_SIZE']
 
-  def split(self, file_path):
-    chunk_file_names = []
+  def split(self, client_directory, file_path):
+    full_path = client_directory + '/' + file_path
     file_name, file_ext = os.path.splitext(file_path)
-    
-    file_number = 1
-    with open(file_path) as file:
+    prefix = client_directory + '/' + file_name
+    new_folder = prefix if os.path.exists(prefix) else os.makedirs(prefix)
+
+    sequence = 1
+    chunk_file_names = []
+    with open(full_path) as file:
         chunk = file.read(self.chunk_size)
         while chunk:
-            with open(file_name + str(file_number) + file_ext, "w+") as chunk_file:
+            with open(prefix + '/' + str(sequence) + file_ext, "w+") as chunk_file:
                 chunk_file.write(chunk)
-            file_number += 1
+            sequence += 1
             chunk = file.read(self.chunk_size)
             chunk_file_names.append(chunk_file.name)
 

@@ -5,6 +5,8 @@ from file_splitter import *
 from config import SOCK_CONFIG, MESSAGES
 from logger import Logger
 import hashlib
+from os import listdir
+from os.path import isfile, join
 
 class Client:
   def __init__(self, port_number, enable_logging=False):
@@ -13,19 +15,9 @@ class Client:
     self.id = str(port_number)
     self.log = Logger('Client ' + self.id, enable_logging).log
     self.registered = False
-    # so we don't alter system files. only compatible for MacOS
-    self.folder = '/~/tmp/' + str(port_number)
+
+    self.directory = '/tmp/' + str(port_number)
     self.file_splitter = FileSplitter()
-
-    # shoud we have only 1 socket for this client, or 1 socket per peer?
-
-    # list of peers it is connected to
-    # peers need to know what pieces of the content each peer in its peer set has
-    self.peer_set = []
-
-    # leecher state: it is still downloading the file while uploading pieces it has to other leechers
-    # seed state: it has the complete file and is uploading to leechers
-    self.state = None
 
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
@@ -48,12 +40,65 @@ class Client:
       sock.close()
       raise RuntimeError
 
-  def get_active_peers(self):
-    # get active peers by asking the tracker
-    return []
+  # tmp/client1/test.txt will be split into tmp/client1/test/1.txt..10.txt
+  def upload(self, file_location):
+    # assumption: file has to be within /tmp/:client_id/
+    full_path = self.directory + '/' + file_location
+    file_name, file_ext = os.path.splitext(file_location)
+    file_chunks = self.file_splitter.split(self.directory, 'test.txt')
+    self.log(file_chunks)
+
+    x = self.reorder_and_combine_chunks(full_path, 'hi' + file_ext)
+    self.log(x)
+
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
+
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_digest])
+    # sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+
+    if response == MESSAGES['UPLOAD_ACK']:
+      self.log('succesfully notified tracker')
+      sock.close()
+    else:
+      self.log('unsuccessfully notified tracker')
+      sock.close()
+      raise RuntimeError
+
+  def download(self, file_id):
+    peers = self.get_active_peers(file_id)
+    self.log('active peers', peers)
+    # connect to those peers and download all parts
+    for peer in peers:
+      self.send_to_peer(peer, file_id)
+
+    # reorder parts
+
+
+  def get_active_peers(self, file_id):
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
+
+    message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_id])
+    sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+
+    if response[0] == MESSAGES['DOWNLOAD_ACK']:
+      active_peers = response[1]
+      self.log('successfully obtained active peers from tracker:', active_peers)
+      sock.close()
+      return active_peers
+    
+    else:
+      self.log('unable to obtain active peers from tracker')
+      sock.close()
+      raise RuntimeError
 
   def send_to_peer(self, peer_port, file):
-    peer_address = (SOCK_CONFIG['ADDRESS'], peer_port)
+    peer_address = (SOCK_CONFIG['CLIENT_ADDRESS'], peer_port)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(peer_address)
     sock.send(file.encode('utf-8'))
@@ -67,52 +112,6 @@ class Client:
       sock.close()
       raise RuntimeError
 
-  def upload(self, file_location):
-    file = open(file_location,'rb').read()
-    file_digest = hashlib.md5(file).hexdigest()
-
-    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
-    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    sock.connect(tracker_address)
-
-    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_digest])
-    self.log(message)
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
-
-    if response == MESSAGES['UPLOAD_ACK']:
-      self.log('succesfully notified tracker')
-      sock.close()
-    else:
-      self.log('unsuccessfully notified tracker')
-      sock.close()
-      raise RuntimeError
-
-  def download(self, file_id):
-    peers = self.get_active_peers(file_id)
-    # connect to those peers and download all parts
-    # reorder parts
-
-  def get_active_peers(self, file_id):
-    tracker_address = (SOCK_CONFIG['ADDRESS'], SOCK_CONFIG['REGISTER_PORT'])
-    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    sock.connect(tracker_address)
-
-    message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_id])
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
-
-    if response[0] == MESSAGES['DOWNLOAD_ACK']:
-      active_peers = response[1]
-      self.log('successfully obtained active peers from tracker:', active_peers)
-      sock.close()
-      return active_peers
-    
-    else:
-      self.log('unable to obtain active peers from tracker')
-      sock.close()
-      raise RuntimeError
-
   def disconnect(self):
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -120,10 +119,20 @@ class Client:
     message = MESSAGES['DISCONNECT']
     sock.send(message.encode('utf-8'))
 
-  def reorder_parts(self, parts):
-    # sort parts of files by some index
-    # combine parts
-    pass
+  def reorder_and_combine_chunks(self, file_name, new_file_path):
+    # get all files in the right directory
+    # after a client downloads, all the chunks will live in /tmp/:port/:name/1..100
+    # path = self.directory + '/' + file_name
+    path, file_ext = os.path.splitext(file_name)
+    self.log('path is', path)
+    file_parts = [f for f in listdir(path) if isfile(join(path, f))]
+
+    with open(self.directory + '/' + new_file_path, 'w' ) as result:
+      for f in file_parts:
+          for line in open(path + '/' + f, 'r' ):
+              result.write(line)
+
+    return new_file_path
 
   def construct_message(self, op, messages = []):
     # messages is an array

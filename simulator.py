@@ -1,6 +1,7 @@
 import threading
 from threading import Thread
 import time
+import os
 
 from client import Client
 from tracker import Tracker
@@ -17,31 +18,43 @@ def run_client_simulation(client_id):
   print('starting client simulation', client_id)
   client = Client(client_id, True)
   clients[client_id] = client
+
+  if not os.path.exists(client.directory):
+      os.makedirs(client.directory)
+      print('created directory:', client.directory)
+
   # this sleep is required so that the tracker has time to listen to the new port
   time.sleep(1)
 
-  # simulate an upload
-  # random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
-  # uploader = clients[random_id]
-  # file_location = '/tmp/test.txt'
-  # uploader.upload(file_location)
+  if client_id == 10000:
+    run_upload_simulation(client_id)
 
-  # random_id = randint(10000, 10000 + NUM_CLIENTS - 1)
-  # downloader = clients[random_id]
-  # print(downloader)
-  # downloader.download('f0f0f8e489652435c38caa6e53b7b749')
-  
+  if client_id == 10001:
+    run_download_simulation(client_id)
+
   client.disconnect()
+
+def run_upload_simulation(client_id):
+  uploader = clients[client_id]
+  file_name = 'test.txt'
+  uploader.upload(file_name)
+
+def run_download_simulation(client_id, file_name='test.txt'):
+  downloader = clients[client_id]
+  downloader.download(file_name)
 
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)
-
   tracker_thread.start()
 
   for i in range(NUM_CLIENTS):
     client_id = 10000 + i
     client_thread = Thread(target=run_client_simulation, args=[client_id])
     client_thread.start()
+
+  # time.sleep(3)
+  # run_upload_simulation(10000)
+  # run_download_simulation(10003)
 
   time.sleep(10)
   kill_tracker_thread = Thread(target=Tracker.kill_self())
