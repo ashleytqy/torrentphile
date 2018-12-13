@@ -2,12 +2,13 @@ import threading
 from threading import Thread
 import time
 import os
+import atexit
 
 from client import Client
 from tracker import Tracker
 from random import randint
 
-NUM_CLIENTS = 5
+NUM_CLIENTS = 3
 clients = {} # map client id to the actual client object
 
 def run_tracker_simulation():
@@ -43,6 +44,12 @@ def run_download_simulation(client_id, file_name='test.txt'):
   downloader = clients[client_id]
   downloader.download(file_name)
 
+def exit_handler():
+  for key in clients:
+    clients[key].disconnect()
+
+atexit.register(exit_handler)
+
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)
   tracker_thread.start()
@@ -52,10 +59,6 @@ if __name__== "__main__":
     client_thread = Thread(target=run_client_simulation, args=[client_id])
     client_thread.start()
 
-  # time.sleep(3)
-  # run_upload_simulation(10000)
-  # run_download_simulation(10003)
-
-  time.sleep(10)
+  time.sleep(5)
   kill_tracker_thread = Thread(target=Tracker.kill_self())
   kill_tracker_thread.start()

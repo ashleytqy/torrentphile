@@ -49,11 +49,11 @@ class Client:
 
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    # sock.connect(tracker_address)
+    sock.connect(tracker_address)
 
     message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_location])
     # sock.send(message.encode('utf-8'))
-    # response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
 
     if response == MESSAGES['UPLOAD_ACK']:
       self.log('succesfully notified tracker')
