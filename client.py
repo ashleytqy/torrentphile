@@ -30,12 +30,11 @@ class Client:
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
     self.register()
-    
 
   def register(self):
-    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], SOCK_CONFIG['REGISTRATION_PORT'])
+    registration_address = (SOCK_CONFIG['TRACKER_ADDRESS'], SOCK_CONFIG['REGISTRATION_PORT'])
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    sock.connect(tracker_address)
+    sock.connect(registration_address)
     message = MESSAGES['REGISTER_CLIENT'] + ' ' + self.id
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
@@ -76,7 +75,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['UPLOAD_FILE'] + ' ' + self.id + ' ' + file_digest
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_digest])
     self.log(message)
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
@@ -99,7 +98,7 @@ class Client:
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = MESSAGES['DOWNLOAD_FILE'] + ' ' + self.id + ' ' + file_id
+    message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_id])
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').splitlines()
 
@@ -114,7 +113,18 @@ class Client:
       sock.close()
       raise RuntimeError
 
+  def disconnect(self):
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
+    message = MESSAGES['DISCONNECT']
+    sock.send(message.encode('utf-8'))
+
   def reorder_parts(self, parts):
     # sort parts of files by some index
     # combine parts
     pass
+
+  def construct_message(self, op, messages = []):
+    # messages is an array
+    return (' ').join([op, self.id] + messages)

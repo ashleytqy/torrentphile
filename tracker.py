@@ -17,6 +17,7 @@ class Tracker:
     # mapping the hex digest of a file to the clients that current have it
     self.file_to_client = {}
     self.registered_client = None
+    self.kill = False
 
     self.connect_clients()
 
@@ -31,18 +32,22 @@ class Tracker:
       registration_thread.start()
       registration_thread.join()
 
+      if self.kill:
+        break
+
       listen_thread = Thread(target=self.listen, args=[self.registered_client])
       listen_thread.start()
 
   def connect_client(self):
+    self.log('connecting client')
     registration_conn = self.registration_sock.accept()[0]
     response = registration_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
     command = response.split(' ')[0]
 
-    if command != MESSAGES['REGISTER_CLIENT']:
-      registration_conn.close()
-      return None
-    else:
+    if command == MESSAGES['KILL_TRACKER']:
+      self.log('killing tracker')
+      self.process_kill()
+    elif command == MESSAGES['REGISTER_CLIENT']:
       # client_id is also the client's port number
       # in a real application, the client_id would be its address, but since we're running
       # everything on one machine, this isn't feasible
@@ -51,13 +56,18 @@ class Tracker:
         'address': SOCK_CONFIG['CLIENT_ADDRESS'],
         'port': int(client_id),
       }
-      self.clients[client_id] = client_config
 
+      self.clients[client_id] = client_config
       self.log('registered', client_id)
+
       registration_conn.send(MESSAGES['REGISTER_ACK'].encode('utf-8'))
       registration_conn.close()
 
       self.registered_client = client_id
+    else:
+      self.log('incorrect registration message', response)
+      registration_conn.close()
+      return None
     
   def listen(self, client_id):
       self.log('listening to', client_id)
@@ -82,7 +92,7 @@ class Tracker:
           self.process_download(client_id, client_conn, response)
 
         elif command == MESSAGES['DISCONNECT']:
-          client_conn.close()
+          self.process_disconnect(client_id, client_conn, response)
           break
 
   def process_upload(self, client_id, client_conn, response):
@@ -101,4 +111,17 @@ class Tracker:
     # client_conn.send(message.encode('utf-8'))
     pass
 
-  
+  def process_disconnect(self, client_id, client_conn, response):
+    client_conn.close()
+    self.log('successfully disconnected', client_id)
+
+  def process_kill(self):
+    self.kill = True
+
+  @staticmethod
+  def kill_self():
+    registration_address = (SOCK_CONFIG['TRACKER_ADDRESS'], SOCK_CONFIG['REGISTRATION_PORT'])
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(registration_address)
+    message = MESSAGES['KILL_TRACKER']
+    sock.send(message.encode('utf-8'))
