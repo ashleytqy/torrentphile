@@ -8,7 +8,7 @@ from client import Client
 from tracker import Tracker
 from random import randint
 
-NUM_CLIENTS = 3
+NUM_CLIENTS = 5
 clients = {} # map client id to the actual client object
 
 def run_tracker_simulation():
@@ -28,19 +28,24 @@ def run_client_simulation(client_id):
   time.sleep(1)
 
   if client_id == 10000:
-    run_upload_simulation(client_id)
+    run_upload_simulation(client_id, 'test.txt')
+
+  if client_id == 10002:
+    run_upload_simulation(client_id, 'fun.txt') 
 
   if client_id == 10001:
-    run_download_simulation(client_id)
+    run_download_simulation(client_id, 'fun.txt')
+
+  if client_id == 10004:
+    run_download_simulation(client_id, 'test.txt')
 
   client.disconnect()
 
-def run_upload_simulation(client_id):
+def run_upload_simulation(client_id, file_name):
   uploader = clients[client_id]
-  file_name = 'test.txt'
   uploader.upload(file_name)
 
-def run_download_simulation(client_id, file_name='test.txt'):
+def run_download_simulation(client_id, file_name):
   downloader = clients[client_id]
   downloader.download(file_name)
 

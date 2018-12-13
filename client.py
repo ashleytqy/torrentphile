@@ -45,7 +45,7 @@ class Client:
     # assumption: file has to be within /tmp/:client_id/
     full_path = self.directory + '/' + file_location
     file_name, file_ext = os.path.splitext(file_location)
-    file_chunks = self.file_splitter.split(self.directory, 'test.txt')
+    file_chunks = self.file_splitter.split(self.directory, file_location)
     how_many_chunks = len(file_chunks)
 
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
@@ -56,11 +56,11 @@ class Client:
     sock.send(message.encode('utf-8'))
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
 
-    if response == MESSAGES['UPLOAD_ACK']:
-      self.log('succesfully notified tracker')
+    if response[0] == MESSAGES['UPLOAD_ACK']:
+      self.log('succesfully uploaded to tracker')
       sock.close()
     else:
-      self.log('unsuccessfully notified tracker')
+      self.log('failed to upload to tracker')
       sock.close()
       raise RuntimeError
 
@@ -116,7 +116,6 @@ class Client:
     message = MESSAGES['DISCONNECT']
     sock.send(message.encode('utf-8'))
     sock.close()
-
 
   # call this method after client has successfully downloaded all chunks
   # and stored all the chunks in its folder

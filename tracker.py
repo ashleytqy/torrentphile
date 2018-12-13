@@ -83,12 +83,11 @@ class Tracker:
         response = client_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
         command = response.split(' ')[0]
 
-        self.log('received response from ' + client_id + ':', response)
-
         if not response:
-          self.log("error. this should not happen.")
+          self.log("end.")
           break
 
+        self.log('received response from ' + client_id + ':', response)
 
         if command == MESSAGES['UPLOAD_FILE']:
           self.process_upload(client_id, client_conn, response)
@@ -114,8 +113,7 @@ class Tracker:
 
     self.log(self.file_to_client)
     message = MESSAGES['UPLOAD_ACK']
-    
-    # client_conn.send(message.encode('utf-8'))
+    client_conn.send(message.encode('utf-8'))
 
   def process_download(self, client_id, client_conn, response):
     # file_uuid = arguments
