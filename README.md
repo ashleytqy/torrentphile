@@ -17,18 +17,23 @@ A peer-to-peer file transfer application similar to BitTorrent where users can u
 - We're only supporting `.txt` files for simplicity
 - We won't be splitting the files into multiple chunks and distributing the chunks across multiple peers. Instead, we will be sending the whole file for simplicity
 
-# Upload
+# Upload Process
 - Client A wants to upload `test.txt`
 - It informs the Tracker that it has `test.txt` and the Tracker updates it's internal records of which clients have which files
 - Tracker sends an `ACK` to the client
 
-# Download
+# Download Process
 - Client B wants to download `test.txt`
 - It asks the Tracker which peers have `test.txt`
 - The Tracker randomly chooses a peer from it's internal records, Peer C
 - Client B makes a connection with Peer C to download `test.txt`
 - Peer C sends `test.txt` to Client B and `test.txt` ends up in Client B's local directory
 
+---
+# Running
+```
+python3 simulator.py
+```
 # References
 http://www.bittorrent.org/bittorrentecon.pdf
 http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.114.4974&rep=rep1&type=pdf

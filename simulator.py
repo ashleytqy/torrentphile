@@ -21,6 +21,15 @@ def run_client_simulation(client_id):
       os.makedirs(client.directory)
       print('created directory:', client.directory)
 
+      if client_id == 10000:
+        print('created test file in ' + client.directory + "/test1.txt")
+        with open(client.directory + "/test1.txt", "w") as file:
+          file.write("hello")
+
+        print('created test file in ' + client.directory + "/test3.txt")
+        with open(client.directory + "/test3.txt", "w") as file:
+          file.write("world")
+
   # this sleep is required so that the tracker has time to listen to the new port
   time.sleep(1)
 
