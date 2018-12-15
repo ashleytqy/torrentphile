@@ -20,7 +20,6 @@ class Tracker:
 
     self.connect_clients()
 
-  # continually listen on a port for any incoming client requests to connect 
   def connect_clients(self):
     self.registration_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     self.registration_sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)

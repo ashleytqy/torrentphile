@@ -17,6 +17,13 @@ A peer-to-peer file transfer application similar to BitTorrent where users can u
 - We're only supporting `.txt` files for simplicity
 - We won't be splitting the files into multiple chunks and distributing the chunks across multiple peers. Instead, we will be sending the whole file for simplicity
 
+---
+# Set Up
+- The Tracker server is set up to listen on port 8000
+- 5 client servers are initialised and registers itself with the Tracker
+- The Tracker sends an `ACK` to the client if the registration succeeds
+- The Tracker continually listen on a port for any incoming client requests to upload or download a file
+
 # Upload Process
 - Client A wants to upload `test.txt`
 - It informs the Tracker that it has `test.txt` and the Tracker updates it's internal records of which clients have which files
