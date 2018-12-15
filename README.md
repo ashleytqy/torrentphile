@@ -16,9 +16,10 @@ A P2P file transfer application similar to BitTorrent – where a user can uploa
 - Contents of files with the same name are the same, i.e. File1.txt === File2.txt
 - Each client has a specific folder where it stores it's downlaoded file / file chunks, in `/tmp/client_id`
 - The downloaded file chunks of file `test.txt` lives in `/tmp/client_id/test/1...10.txt`
+- We're only supporting `.txt` files
 
 # Upload
-During the upload process, Client A talks to the Tracker and notifies the Tracker that A has a certain file. Client A then splits the file into smaller chunks.
+During the upload process, Client A talks to the Tracker and notifies the Tracker that A has a certain file.
 
 # Download
 

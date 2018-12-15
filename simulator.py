@@ -27,24 +27,21 @@ def run_client_simulation(client_id):
 
   if client_id == 10000:
     client.upload('test1.txt')
-  #   client.upload('test2.txt')
-  
-  # if client_id == 10001:
-  #   client.upload('test3.txt')
-
-  if client_id == 10002:
-    client.download('test1.txt')
-    client.download('text2.txt')
+    client.upload('test3.txt')
 
   if client_id == 10001:
     client.download('test2.txt')
-    client.download('text1.txt')
+
+  if client_id == 10002:
+    client.download('test1.txt')
 
   if client_id == 10003:
     client.download('test3.txt')
-    client.download('text1.txt')
 
-  time.sleep(3)
+  if client_id == 10004:
+    client.download('test1.txt')
+
+  time.sleep(1)
 
   client.disconnect()
 

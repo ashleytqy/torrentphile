@@ -14,6 +14,7 @@ class Client:
     self.directory = '/tmp/' + str(port_number)
     self.uploaded_files = []
     self.kill = False
+
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
     self.register()
@@ -102,8 +103,8 @@ class Client:
 
         if chunk == MESSAGES['DOWNLOAD_END']:
           break
-        else:
-          file.write(chunk)
+
+        file.write(chunk)
 
       file.close()
 
@@ -161,7 +162,6 @@ class Client:
     return sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
   def construct_message(self, op, messages = []):
-    # messages is an array
     messages = [str(m) for m in messages]
     return (' ').join([op] + messages)
 

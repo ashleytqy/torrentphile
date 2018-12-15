@@ -1,4 +1,3 @@
-import sys
 import os
 import random
 import socket as s
@@ -14,7 +13,6 @@ class Tracker:
     self.registration_port = SOCK_CONFIG['REGISTRATION_PORT']
     self.address = SOCK_CONFIG['TRACKER_ADDRESS']
     self.clients = {}
-    self.sock = None
     # mapping the filename and part to the clients that current have it
     self.file_to_client = {}
     self.registered_client = None
@@ -110,17 +108,12 @@ class Tracker:
 
   def process_download(self, client_id, client_conn, response):
     file_name = response.split(' ')[1]
-    print('file_name:', file_name)
-    print('file_to_client.keys():', self.file_to_client.keys())
-    print(file_name, 'in', self.file_to_client.keys(), ':', file_name in self.file_to_client)
 
-    if file_name not in self.file_to_client:
+    if file_name not in self.file_to_client.keys():
       message = MESSAGES['NONEXISTENT_FILE']
     else:
       # our policy is to choose a random peer to download from
       message = random.choice(self.file_to_client[file_name])
-
-    print('sending', message)
 
     client_conn.send(message.encode('utf-8'))
 
