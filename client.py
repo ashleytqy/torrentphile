@@ -2,7 +2,6 @@ import sys
 import socket as s
 import time
 
-from file_splitter import *
 from config import SOCK_CONFIG, MESSAGES
 from logger import Logger
 import hashlib
@@ -16,10 +15,7 @@ class Client:
     self.id = str(port_number)
     self.log = Logger('Client ' + self.id, enable_logging).log
     self.registered = False
-
     self.directory = '/tmp/' + str(port_number)
-    self.file_splitter = FileSplitter()
-
     # when we initialise a client, we automatically inform the tracker
     # i.e. we initialise a connection to the tracker server
     self.register()
@@ -33,47 +29,48 @@ class Client:
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
     if response == MESSAGES['REGISTER_ACK']:
-      self.log('succesfully registered')
+      self.log('registered')
       self.registered = True
       sock.close()
+
+      
     else:
-      self.log('unsuccessfully registered with response', response)
+      self.log('unregistered with response', response)
       sock.close()
       raise RuntimeError
 
-  # tmp/client1/test.txt will be split into tmp/client1/test/1.txt..10.txt
-  def upload(self, file_location):
-    # assumption: file has to be within /tmp/:client_id/
-    full_path = self.directory + '/' + file_location
-    file_name, file_ext = os.path.splitext(file_location)
-    file_chunks = self.file_splitter.split(self.directory, file_location)
-    how_many_chunks = len(file_chunks)
+  def listen_to_peers(self):
 
+  def upload(self, file_name):
+    # assumption: file has to be within /tmp/:client_id/
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     sock.connect(tracker_address)
 
-    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_location, how_many_chunks])
+    message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_name])
     sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
-    if response[0] == MESSAGES['UPLOAD_ACK']:
-      self.log('succesfully uploaded to tracker')
-      sock.close()
+    if response == MESSAGES['UPLOAD_ACK']:
+      self.log('uploaded', file_name, 'to tracker')
     else:
       self.log('failed to upload to tracker')
-      sock.close()
       raise RuntimeError
 
-  def download(self, file_id):
-    peers = self.get_active_peers(file_id)
-    self.log('active peers', peers)
-    # connect to those peers and download all parts
-    for peer in peers:
-      self.send_to_peer(peer, file_id)
+  def download(self, file_name):
+    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
+    sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    sock.connect(tracker_address)
 
-    # reorder parts
-
+    message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_name])
+    sock.send(message.encode('utf-8'))
+    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+    
+    if response == MESSAGES['NONEXISTENT_FILE']:
+      self.log('failed to download non-existent', file_name)
+    else:
+      peer_port = int(response)
+      self.log('downloaded', file_name, 'from client', peer_port)
 
   def get_active_peers(self, file_id):
     tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], self.port_number)
@@ -86,7 +83,7 @@ class Client:
 
     if response[0] == MESSAGES['DOWNLOAD_ACK']:
       active_peers = response[1]
-      self.log('successfully obtained active peers from tracker:', active_peers)
+      self.log('obtained active peers from tracker:', active_peers)
       sock.close()
       return active_peers
     
@@ -107,10 +104,10 @@ class Client:
     response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
     if response == MESSAGES['REGISTER_ACK']:
-      self.log('succesfully sent file chunk')
+      self.log('sent file chunk')
       sock.close()
     else:
-      self.log('unsuccessfully sent file chunk')
+      self.log('unsent file chunk')
       sock.close()
       raise RuntimeError
 
@@ -122,7 +119,9 @@ class Client:
     sock.send(message.encode('utf-8'))
     sock.close()
 
-  # call this method after client has successfully downloaded all chunks
+    self.log('disconnected')
+
+  # call this method after client has downloaded all chunks
   # and stored all the chunks in its folder
   # the saved file path would be the file_name_[epoch time]
   def reorder_and_combine_chunks(self, file_name):
@@ -144,4 +143,4 @@ class Client:
   def construct_message(self, op, messages = []):
     # messages is an array
     messages = [str(m) for m in messages]
-    return (' ').join([op, str(self.id)] + messages)
+    return (' ').join([op] + messages)

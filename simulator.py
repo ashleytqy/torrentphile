@@ -12,11 +12,9 @@ NUM_CLIENTS = 5
 clients = {} # map client id to the actual client object
 
 def run_tracker_simulation():
-  print('starting tracker simulation')
-  tracker = Tracker(True)
+  tracker = Tracker(False)
 
 def run_client_simulation(client_id):
-  print('starting client simulation', client_id)
   client = Client(client_id, True)
   clients[client_id] = client
 
@@ -28,19 +26,22 @@ def run_client_simulation(client_id):
   time.sleep(1)
 
   if client_id == 10000:
-    run_upload_simulation(client_id, 'test.txt')
-    # run_upload_simulation(client_id, 'two.txt') 
+    # run_upload_simulation(client_id, 'test.txt')
+    # run_upload_simulation(client_id, 'two.txt')
+    client.upload('test1.txt')
+    client.upload('test2.txt')
+  
+  if client_id == 10001:
+    client.upload('test3.txt')
+  
+  time.sleep(1)
 
   if client_id == 10002:
-    run_upload_simulation(client_id, 'fun.txt') 
-    # run_upload_simulation(client_id, 'another.txt') 
+    client.download('test1.txt')
 
-  if client_id == 10001:
-    run_download_simulation(client_id, 'fun.txt')
-
-  if client_id == 10004:
-    run_download_simulation(client_id, 'test.txt')
-
+  if client_id == 10003:
+    client.download('test3.txt')
+    
   client.disconnect()
 
 def run_upload_simulation(client_id, file_name):

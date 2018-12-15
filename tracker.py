@@ -1,5 +1,6 @@
 import sys
 import os
+import random
 import socket as s
 from threading import Thread
 
@@ -24,6 +25,7 @@ class Tracker:
   # continually listen on a port for any incoming client requests to connect 
   def connect_clients(self):
     self.registration_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
+    self.registration_sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
     self.registration_sock.bind((self.address, self.registration_port))
     self.registration_sock.listen(0)
 
@@ -39,7 +41,6 @@ class Tracker:
       listen_thread.start()
 
   def connect_client(self):
-    self.log('connecting client')
     registration_conn = self.registration_sock.accept()[0]
     response = registration_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
     command = response.split(' ')[0]
@@ -47,6 +48,7 @@ class Tracker:
     if command == MESSAGES['KILL_TRACKER']:
       self.log('killing tracker')
       self.process_kill()
+      registration_conn.close()
     elif command == MESSAGES['REGISTER_CLIENT']:
       # client_id is also the client's port number
       # in a real application, the client_id would be its address, but since we're running
@@ -67,25 +69,19 @@ class Tracker:
     else:
       self.log('incorrect registration message', response)
       registration_conn.close()
-      return None
     
   def listen(self, client_id):
-      self.log('listening to', client_id)
       client_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
       client_config = self.clients[client_id]
       client_config['sock'] = client_sock
-
+      client_sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
       client_sock.bind((client_config['address'], client_config['port']))
       client_sock.listen(0)
-      client_conn = client_sock.accept()[0]
 
-      while True:  
+      while True:
+        client_conn = client_sock.accept()[0]
         response = client_conn.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
         command = response.split(' ')[0]
-
-        if not response:
-          self.log("end.")
-          break
 
         self.log('received response from ' + client_id + ':', response)
 
@@ -99,30 +95,23 @@ class Tracker:
           self.process_disconnect(client_id, client_conn, response)
           break
 
+        client_conn.close()
+
   def process_upload(self, client_id, client_conn, response):
-    client_id = response.split(' ')[1]
-    file_name = response.split(' ')[2]
-    chunk_count = int(response.split(' ')[3])
+    file_name = response.split(' ')[1]
 
-    self.file_to_client[file_name] = {}
-
-    # since the uploader has all the file parts
-    for i in range(chunk_count):
-      self.file_to_client[file_name][i + 1] = [client_id]
+    self.file_to_client[file_name] = [client_id]
 
     message = MESSAGES['UPLOAD_ACK']
     client_conn.send(message.encode('utf-8'))
 
   def process_download(self, client_id, client_conn, response):
-    file_name = response[2]
+    file_name = response.split(' ')[1]
 
     if file_name not in self.file_to_client.keys():
       message = MESSAGES['NONEXISTENT_FILE']
     else:
-      message = MESSAGES['DOWNLOAD_ACK']
-
-      # for table in self.file_to_client[file_uuid]:
-      #   message.append(" " + node)
+      message = random.choice(self.file_to_client[file_name])
 
     client_conn.send(message.encode('utf-8'))
 
