@@ -36,6 +36,20 @@ python3 simulator.py
 ```
 This sets up the environment by creating folders for each client in `/tmp`, i.e. `/tmp/10000`, `/tmp/10001`... and creating the test files for a client. Then, it simulates client uploads and downloads.
 
+After running the simulation, the `/tmp` directory should look like this:
+```
+├── 10000
+│   ├── test1.txt
+│   └── test3.txt
+├── 10001
+├── 10002
+│   └── test1.txt
+├── 10003
+│   └── test3.txt
+├── 10004
+│   ├── test1.txt
+│   └── test3.txt
+```
 
 # References
 http://www.bittorrent.org/bittorrentecon.pdf
