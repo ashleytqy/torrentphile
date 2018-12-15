@@ -13,7 +13,7 @@ clients = {} # map client id to the actual client object
 def run_tracker_simulation():
   Tracker(False)
 
-def run_client_simulation(client_id):
+def initialise_client(client_id):
   client = Client(client_id, True)
   clients[client_id] = client
 
@@ -33,16 +33,7 @@ def run_client_simulation(client_id):
   # this sleep is required so that the tracker has time to listen to the new port
   time.sleep(1)
 
-if __name__== "__main__":
-  tracker_thread = Thread(target=run_tracker_simulation)
-  tracker_thread.start()
-
-  for i in range(NUM_CLIENTS):
-    client_id = 10000 + i
-    client_thread = Thread(target=run_client_simulation, args=[client_id])
-    client_thread.start()
-
-  time.sleep(1)
+def run_client_simulation():
   clients[10000].upload('test1.txt')
   clients[10000].upload('test3.txt')
 
@@ -54,6 +45,19 @@ if __name__== "__main__":
 
   clients[10004].download('test1.txt')
   clients[10004].download('test3.txt')
+
+if __name__== "__main__":
+  tracker_thread = Thread(target=run_tracker_simulation)
+  tracker_thread.start()
+
+  for i in range(NUM_CLIENTS):
+    client_id = 10000 + i
+    client_thread = Thread(target=initialise_client, args=[client_id])
+    client_thread.start()
+
+  time.sleep(1)
+
+  run_client_simulation()
 
   for i in range(NUM_CLIENTS):
     client = clients[10000 + i]
