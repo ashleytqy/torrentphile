@@ -61,4 +61,4 @@ After running the simulation, the `/tmp` directory should look like this:
 # References
 - https://cs.nyu.edu/courses/fall18/CSCI-UA.0480-009/lectures/lec18.pdf
 - http://www.bittorrent.org/bittorrentecon.pdf
-- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.114.4974
+- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.114.4974&rep=rep1&type=pdf
