@@ -33,27 +33,6 @@ def run_client_simulation(client_id):
   # this sleep is required so that the tracker has time to listen to the new port
   time.sleep(1)
 
-  if client_id == 10000:
-    client.upload('test1.txt')
-    client.upload('test3.txt')
-
-  if client_id == 10001:
-    client.download('test2.txt')
-
-  if client_id == 10002:
-    client.download('test1.txt')
-
-  if client_id == 10003:
-    client.download('test3.txt')
-
-  if client_id == 10004:
-    client.download('test1.txt')
-    client.download('test3.txt')
-
-  time.sleep(1)
-
-  client.disconnect()
-
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)
   tracker_thread.start()
@@ -62,6 +41,23 @@ if __name__== "__main__":
     client_id = 10000 + i
     client_thread = Thread(target=run_client_simulation, args=[client_id])
     client_thread.start()
+
+  time.sleep(1)
+  clients[10000].upload('test1.txt')
+  clients[10000].upload('test3.txt')
+
+  clients[10001].download('test2.txt')
+
+  clients[10002].download('test1.txt')
+
+  clients[10003].download('test3.txt')
+
+  clients[10004].download('test1.txt')
+  clients[10004].download('test3.txt')
+
+  for i in range(NUM_CLIENTS):
+    client = clients[10000 + i]
+    client.disconnect()
 
   time.sleep(5)
   kill_tracker_thread = Thread(target=Tracker.kill_self())
