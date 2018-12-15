@@ -16,6 +16,7 @@ A peer-to-peer file transfer application similar to BitTorrent where users can u
 - Each client has a specific folder where it stores the files it currently have, and files that it will be downloading, in `/tmp/client_id`
 - We're only supporting `.txt` files for simplicity
 - We won't be splitting the files into multiple chunks and distributing the chunks across multiple peers. Instead, we will be sending the whole file for simplicity
+- We will be running the tracker and clients on `localhost` with different ports to simulate having them on different machines
 
 ---
 # Set Up
