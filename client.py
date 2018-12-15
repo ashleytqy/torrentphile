@@ -20,10 +20,8 @@ class Client:
 
   def register(self):
     sock, tracker_address = self.connect_to_port(SOCK_CONFIG['REGISTRATION_PORT'])
-
     message = MESSAGES['REGISTER_CLIENT'] + ' ' + self.id
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+    response = self.send_message_and_get_response(sock, message)
 
     if response == MESSAGES['REGISTER_ACK']:
       self.log('registered')
@@ -71,12 +69,9 @@ class Client:
         break
 
   def upload(self, file_name):
-    # assumption: file has to be within /tmp/:client_id/
     sock, tracker_address = self.connect_to_port(self.port_number)
-
     message = self.construct_message(MESSAGES['UPLOAD_FILE'], [file_name])
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+    response = self.send_message_and_get_response(sock, message)
 
     if response == MESSAGES['UPLOAD_ACK']:
       self.uploaded_files.append(file_name)
@@ -87,10 +82,8 @@ class Client:
 
   def download(self, file_name):
     sock, tracker_address = self.connect_to_port(self.port_number)
-
     message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_name])
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+    response = self.send_message_and_get_response(sock, message)
     
     if response == MESSAGES['NONEXISTENT_FILE']:
       self.log('failed to download non-existent', file_name)
@@ -118,10 +111,8 @@ class Client:
 
   def get_active_peers(self, file_id):
     sock, tracker_address = self.connect_to_port(self.port_number)
-
     message = self.construct_message(MESSAGES['DOWNLOAD_FILE'], [file_id])
-    sock.send(message.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8').split(' ')
+    response = self.send_message_and_get_response(sock, message).split(' ')
 
     if response[0] == MESSAGES['DOWNLOAD_ACK']:
       active_peers = response[1]
@@ -140,8 +131,7 @@ class Client:
 
   def send_to_peer(self, peer_port, file):
     sock, peer_address = self.connect_to_port(peer_port)
-    sock.send(file.encode('utf-8'))
-    response = sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
+    response = self.send_message_and_get_response(sock, file.encode('utf-8'))
 
     if response == MESSAGES['REGISTER_ACK']:
       self.log('sent file chunk')
@@ -161,13 +151,14 @@ class Client:
     self.log('disconnected')
 
   def connect_to_port(self, port):
-    tracker_address = (SOCK_CONFIG['TRACKER_ADDRESS'], port)
+    address = (SOCK_CONFIG['TRACKER_ADDRESS'], port)
     sock = s.socket(s.AF_INET, s.SOCK_STREAM)
-    sock.connect(tracker_address)
-    return (sock, tracker_address)
+    sock.connect(address)
+    return (sock, address)
 
-  def send_message_and_get_response(self, sock, port, message):
-    pass
+  def send_message_and_get_response(self, sock, message):
+    sock.send(message.encode('utf-8'))
+    return sock.recv(SOCK_CONFIG['DATA_SIZE']).decode('utf-8')
 
   def construct_message(self, op, messages = []):
     # messages is an array
