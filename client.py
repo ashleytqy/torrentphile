@@ -43,7 +43,7 @@ class Client:
     # we have to add 10000 to the port number because CLIENT_ADDRESS == TRACKER_ADDRESS when running on one machine
     # and the tracker is listening to (TRACKER_ADDRESS, self.port_number)
     peer_sock.bind((SOCK_CONFIG['CLIENT_ADDRESS'], self.port_number + SOCK_CONFIG['PEER_PORT_INCREMENT']))
-    peer_sock.listen(0)
+    peer_sock.listen(10)
 
     while True:
       peer_conn = peer_sock.accept()[0]

@@ -12,7 +12,7 @@ NUM_CLIENTS = 5
 clients = {} # map client id to the actual client object
 
 def run_tracker_simulation():
-  tracker = Tracker(False)
+  Tracker(False)
 
 def run_client_simulation(client_id):
   client = Client(client_id, True)
@@ -34,11 +34,15 @@ def run_client_simulation(client_id):
 
   if client_id == 10002:
     client.download('test1.txt')
+    client.download('text2.txt')
 
-  # if client_id == 10003:
-  #   client.download('test3.txt')
-  #   # test4.txt should not exist
-  #   client.download('test4.txt')
+  if client_id == 10001:
+    client.download('test2.txt')
+    client.download('text1.txt')
+
+  if client_id == 10003:
+    client.download('test3.txt')
+    client.download('text1.txt')
 
   time.sleep(3)
 
