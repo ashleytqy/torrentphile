@@ -2,7 +2,6 @@ import threading
 from threading import Thread
 import time
 import os
-import atexit
 
 from client import Client
 from tracker import Tracker
