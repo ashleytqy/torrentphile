@@ -26,33 +26,23 @@ def run_client_simulation(client_id):
   time.sleep(1)
 
   if client_id == 10000:
-    # run_upload_simulation(client_id, 'test.txt')
-    # run_upload_simulation(client_id, 'two.txt')
     client.upload('test1.txt')
-    client.upload('test2.txt')
+  #   client.upload('test2.txt')
   
-  if client_id == 10001:
-    client.upload('test3.txt')
-  
-  time.sleep(1)
+  # if client_id == 10001:
+  #   client.upload('test3.txt')
 
   if client_id == 10002:
     client.download('test1.txt')
 
   # if client_id == 10003:
   #   client.download('test3.txt')
+  #   # test4.txt should not exist
+  #   client.download('test4.txt')
 
   time.sleep(3)
 
   client.disconnect()
-
-def run_upload_simulation(client_id, file_name):
-  uploader = clients[client_id]
-  uploader.upload(file_name)
-
-def run_download_simulation(client_id, file_name):
-  downloader = clients[client_id]
-  downloader.download(file_name)
 
 if __name__== "__main__":
   tracker_thread = Thread(target=run_tracker_simulation)
