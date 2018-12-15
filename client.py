@@ -15,8 +15,6 @@ class Client:
     self.uploaded_files = []
     self.kill = False
 
-    # when we initialise a client, we automatically inform the tracker
-    # i.e. we initialise a connection to the tracker server
     self.register()
 
   def register(self):
