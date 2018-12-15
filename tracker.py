@@ -111,7 +111,9 @@ class Tracker:
     if file_name not in self.file_to_client.keys():
       message = MESSAGES['NONEXISTENT_FILE']
     else:
+      # our policy is to choose a random peer to download from
       message = random.choice(self.file_to_client[file_name])
+      self.file_to_client[file_name].append(client_id)
 
     client_conn.send(message.encode('utf-8'))
 

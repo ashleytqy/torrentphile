@@ -39,9 +39,11 @@ def run_client_simulation(client_id):
   if client_id == 10002:
     client.download('test1.txt')
 
-  if client_id == 10003:
-    client.download('test3.txt')
-    
+  # if client_id == 10003:
+  #   client.download('test3.txt')
+
+  time.sleep(3)
+
   client.disconnect()
 
 def run_upload_simulation(client_id, file_name):
