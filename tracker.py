@@ -27,7 +27,7 @@ class Tracker:
     self.registration_sock = s.socket(s.AF_INET, s.SOCK_STREAM)
     self.registration_sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
     self.registration_sock.bind((self.address, self.registration_port))
-    self.registration_sock.listen(0)
+    self.registration_sock.listen(10)
 
     while True:
       registration_thread = Thread(target=self.connect_client)
@@ -76,7 +76,7 @@ class Tracker:
       client_config['sock'] = client_sock
       client_sock.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
       client_sock.bind((client_config['address'], client_config['port']))
-      client_sock.listen(0)
+      client_sock.listen(10)
 
       while True:
         client_conn = client_sock.accept()[0]
@@ -100,20 +100,27 @@ class Tracker:
   def process_upload(self, client_id, client_conn, response):
     file_name = response.split(' ')[1]
 
-    self.file_to_client[file_name] = [client_id]
+    if file_name in self.file_to_client:
+      self.file_to_client[file_name].append(client_id)
+    else:
+      self.file_to_client[file_name] = [client_id]
 
     message = MESSAGES['UPLOAD_ACK']
     client_conn.send(message.encode('utf-8'))
 
   def process_download(self, client_id, client_conn, response):
     file_name = response.split(' ')[1]
+    print('file_name:', file_name)
+    print('file_to_client.keys():', self.file_to_client.keys())
+    print(file_name, 'in', self.file_to_client.keys(), ':', file_name in self.file_to_client)
 
-    if file_name not in self.file_to_client.keys():
+    if file_name not in self.file_to_client:
       message = MESSAGES['NONEXISTENT_FILE']
     else:
       # our policy is to choose a random peer to download from
       message = random.choice(self.file_to_client[file_name])
-      self.file_to_client[file_name].append(client_id)
+
+    print('sending', message)
 
     client_conn.send(message.encode('utf-8'))
 
