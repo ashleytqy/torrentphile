@@ -12,7 +12,7 @@ A peer-to-peer file transfer application similar to BitTorrent where users can u
 - All users stay online during throughout the uploading / downloading of the files (no partitions)
 - All users are "friendly" (no malicious attacks against our tracker, it seeds files that it has downloaded indefinitely).
 - We won't be using a persistent database like MySQL etc. to keep things simple
-- Contents of files with the same name are the same, i.e. sha1(file1.txt) === sha1(file2.txt)
+- Contents of files with the same name are the same, i.e. `sha1(file1.txt) === sha1(file1.txt)`
 - Each client has a specific folder where it stores the files it currently have, and files that it will be downloading, in `/tmp/client_id`
 - We're only supporting `.txt` files for simplicity
 - We won't be splitting the files into multiple chunks and distributing the chunks across multiple peers. Instead, we will be sending the whole file for simplicity
@@ -34,6 +34,9 @@ A peer-to-peer file transfer application similar to BitTorrent where users can u
 ```
 python3 simulator.py
 ```
+This sets up the environment by creating folders for each client in `/tmp`, i.e. `/tmp/10000`, `/tmp/10001`... and creating the test files for a client. Then, it simulates client uploads and downloads.
+
+
 # References
 http://www.bittorrent.org/bittorrentecon.pdf
 http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.114.4974&rep=rep1&type=pdf

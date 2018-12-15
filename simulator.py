@@ -48,6 +48,7 @@ def run_client_simulation(client_id):
 
   if client_id == 10004:
     client.download('test1.txt')
+    client.download('test3.txt')
 
   time.sleep(1)
 
