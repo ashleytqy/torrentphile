@@ -2,8 +2,8 @@
 bittorrent clone and a wordplay on file and phile. 
 
 # Contributors
-@ashleytqy
-@tommyguo
+@[ashleytqy](https://github.com/ashleytqy)
+@[tommyguo](https://github.com/tommyguo)
 
 # What
 A peer-to-peer file transfer application similar to BitTorrent where users can upload files that will be distributed across the other users online in the system when they download the file, as opposed to a central server storing all the files.
